@@ -17,7 +17,7 @@ public class InventoryPage {
     @FindBy(className = "inventory_item")
     private List<WebElement> inventoryItemList;
 
-    private final By inventoryButton = By.xpath("//button[contains(@class,'btn_inventory')]");
+    private final By inventoryButton = By.xpath(".//button[contains(@class,'btn_inventory')]");
 
     public void selectItemByName(String itemName) {
         for (WebElement webElement : inventoryItemList) {

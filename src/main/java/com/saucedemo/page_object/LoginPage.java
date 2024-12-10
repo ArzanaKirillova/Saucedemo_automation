@@ -5,11 +5,18 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class LoginPage {
 
+    WebDriverWait wait;
+
     public LoginPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(2));
     }
 
     // PageFactory
@@ -25,6 +32,9 @@ public class LoginPage {
     public void authorize(String username, String password) {
         usernameField.sendKeys(username);
         passwordField.sendKeys(password);
+
+        // Explicitly wait element to be clickable
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton));
         loginButton.click();
     }
 }
