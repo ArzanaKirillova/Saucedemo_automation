@@ -17,9 +17,14 @@ public class CartPage {
     @FindBy(how = How.CLASS_NAME, using = "cart_item")
     private List<WebElement> cartItems;
 
+    @FindBy(how = How.ID, using = "checkout")
+    private WebElement checkoutButton;
+
     public List<WebElement> getCartItems() {
         return cartItems;
     }
 
-
+    public WebElement getCheckoutButton() {
+        return checkoutButton;
+    }
 }

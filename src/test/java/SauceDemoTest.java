@@ -1,7 +1,5 @@
-import com.saucedemo.page_object.CartPage;
-import com.saucedemo.page_object.HeaderPage;
-import com.saucedemo.page_object.InventoryPage;
-import com.saucedemo.page_object.LoginPage;
+import com.github.javafaker.Faker;
+import com.saucedemo.page_object.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -22,9 +20,12 @@ public class SauceDemoTest {
     InventoryPage inventoryPage;
     HeaderPage headerPage;
     CartPage cartPage;
+    CheckoutPage checkoutPage;
 
     Configurations configs;
     Configuration config;
+    Faker randomData = new Faker();
+
 
     @BeforeMethod
     public void setUp() throws ConfigurationException {
@@ -33,6 +34,7 @@ public class SauceDemoTest {
         inventoryPage = new InventoryPage(driver);
         headerPage = new HeaderPage(driver);
         cartPage = new CartPage(driver);
+        checkoutPage = new CheckoutPage(driver);
 
         configs = new Configurations();
         config = configs.properties("config.properties");
@@ -70,6 +72,18 @@ public class SauceDemoTest {
         assertThat(cartPage.getCartItems())
                 .extracting(WebElement::getText)
                 .anyMatch(text -> text.contains("Backpack"));
+
+        cartPage.getCheckoutButton().click();
+        checkoutPage.fillStepOne(
+                randomData.funnyName().name(),
+                randomData.howIMetYourMother().character(),
+                randomData.address().zipCode() );
+      double backpackPrice = checkoutPage.convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Backpack"));
+      double bikeLightPrice = checkoutPage.convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Bike Light"));
+      double sumPrice = backpackPrice + bikeLightPrice;
+        System.out.println(sumPrice);
+
+
     }
 
     @AfterMethod
