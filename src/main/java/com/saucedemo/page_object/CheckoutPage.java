@@ -10,12 +10,15 @@ import org.openqa.selenium.support.PageFactory;
 import java.util.List;
 import java.util.Optional;
 
+import static com.saucedemo.utils.Helper.convertStringWithDollarToDouble;
+
 public class CheckoutPage {
+
     public CheckoutPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
 
-    // Create 3 fields and 1 button using @FindBy;
+    private final By itemPriceElement = By.xpath(".//div[@class='inventory_item_price']");
 
     @FindBy(how = How.ID, using = "first-name")
     private WebElement firstNameInputField;
@@ -32,6 +35,18 @@ public class CheckoutPage {
     @FindBy(how = How.CLASS_NAME, using = "cart_item")
     private List<WebElement> cartItems;
 
+    @FindBy(how = How.CLASS_NAME, using = "summary_tax_label")
+    private WebElement taxLabel;
+
+    @FindBy(how = How.CLASS_NAME, using = "summary_total_label")
+    private WebElement summaryTotalLabel;
+
+    @FindBy(how = How.ID, using = "finish")
+    private WebElement finishButton;
+
+    @FindBy(how = How.CLASS_NAME, using = "complete-header")
+    private WebElement completeHeader;
+
     public WebElement getFirstNameInputField() {
         return firstNameInputField;
     }
@@ -47,23 +62,47 @@ public class CheckoutPage {
     public WebElement getSubmitButton() {
         return submitButton;
     }
+
+    public List<WebElement> getCartItems() {
+        return cartItems;
+    }
+
+    public WebElement getTaxLabel() {
+        return taxLabel;
+    }
+
+    public WebElement getSummaryTotalLabel() {
+        return summaryTotalLabel;
+    }
+
+    public WebElement getFinishButton() {
+        return finishButton;
+    }
+
+    public WebElement getCompleteHeader() {
+        return completeHeader;
+    }
+
     public void fillStepOne(String firstName, String lastName, String postalCode) {
         firstNameInputField.sendKeys(firstName);
-       lastNameInputField.sendKeys(lastName);
-       postalCodeInputField.sendKeys(postalCode);
-       submitButton.click();
-
+        lastNameInputField.sendKeys(lastName);
+        postalCodeInputField.sendKeys(postalCode);
+        submitButton.click();
     }
+
     public String getPriceByItemName(String itemName) {
         Optional<WebElement> cartItem = cartItems.stream()
                 .filter(item -> item.getText().contains(itemName)).
                 findFirst();
 
-        return cartItem.get().findElement(By.xpath(".//div[@class='inventory_item_price']")).getText();
+        return cartItem.get().findElement(itemPriceElement).getText();
     }
 
-   public double convertStringWithDollarToDouble(String amount) {
-      return Double.parseDouble(amount.replace("$", ""));
+    public double getTax() {
+        return convertStringWithDollarToDouble(getTaxLabel().getText().replace("Tax: ", ""));
+    }
 
-   }
+    public double getSummaryTotal() {
+        return convertStringWithDollarToDouble(getSummaryTotalLabel().getText().replace("Total: ", ""));
+    }
 }

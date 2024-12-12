@@ -1,5 +1,6 @@
 import com.github.javafaker.Faker;
 import com.saucedemo.page_object.*;
+import com.saucedemo.utils.Helper;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -11,6 +12,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static com.saucedemo.utils.Helper.convertStringWithDollarToDouble;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SauceDemoTest {
@@ -24,8 +26,8 @@ public class SauceDemoTest {
 
     Configurations configs;
     Configuration config;
-    Faker randomData = new Faker();
 
+    Faker randomData = new Faker();
 
     @BeforeMethod
     public void setUp() throws ConfigurationException {
@@ -76,14 +78,19 @@ public class SauceDemoTest {
         cartPage.getCheckoutButton().click();
         checkoutPage.fillStepOne(
                 randomData.funnyName().name(),
-                randomData.howIMetYourMother().character(),
-                randomData.address().zipCode() );
-      double backpackPrice = checkoutPage.convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Backpack"));
-      double bikeLightPrice = checkoutPage.convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Bike Light"));
-      double sumPrice = backpackPrice + bikeLightPrice;
+                randomData.address().lastName(),
+                randomData.address().zipCode());
+
+        double backpackPrice = convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Backpack"));
+        double bikeLightPrice = convertStringWithDollarToDouble(checkoutPage.getPriceByItemName("Bike Light"));
+        double sumPrice = backpackPrice + bikeLightPrice;
         System.out.println(sumPrice);
 
+        double totalPrice = sumPrice + checkoutPage.getTax();
+        assertThat(checkoutPage.getSummaryTotal()).isEqualTo(totalPrice);
 
+        checkoutPage.getFinishButton().click();
+        assertThat(checkoutPage.getCompleteHeader().getText()).isEqualTo("Thank you for your order!");
     }
 
     @AfterMethod
